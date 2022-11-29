@@ -115,3 +115,15 @@ encodeModified l = map (\(n, x) -> if n == 1 then Single x else Multiple n x) $ 
 
 test11_1 :: Integer
 test11_1 = assert (encodeModified "aaaabccaadeeee" == [Multiple 4 'a', Single 'b', Multiple 2 'c', Multiple 2 'a',Single 'd', Multiple 4 'e']) 0
+
+-- Problem 12
+decodeModified :: [Repeat a] -> [a]
+decodeModified x = case x of
+    [] -> []
+    (Single a : b) -> a : decodeModified b
+    (Multiple n a : b) -> [a | i <- [1..n]] ++ decodeModified b
+
+test12_1 :: Integer
+test12_1 = assert (decodeModified 
+       [Multiple 4 'a', Single 'b', Multiple 2 'c',
+        Multiple 2 'a', Single 'd', Multiple 4 'e'] == "aaaabccaadeeee") 0
