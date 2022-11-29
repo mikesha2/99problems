@@ -60,6 +60,7 @@ test6_2 = assert (not $ isPalindrome [1, 2, 3, 4, 5]) 0
 
 -- Problem 7
 data NestedList a = Elem a | List [NestedList a]
+    deriving (Eq, Show)
 --flatten :: NestedList a -> [a]
 flatten :: NestedList a -> [a]
 flatten x = case x of
@@ -105,3 +106,12 @@ encode = encodeHelper . pack
 
 test10_1 :: Integer
 test10_1 = assert (encode "aaaabccaadeeee" == [(4,'a'),(1,'b'),(2,'c'),(2,'a'),(1,'d'),(4,'e')]) 0
+
+-- Problem 11
+data Repeat a = Single a | Multiple Int a
+    deriving (Eq, Show)
+encodeModified :: Eq a => [a] -> [Repeat a]
+encodeModified l = map (\(n, x) -> if n == 1 then Single x else Multiple n x) $ encode l
+
+test11_1 :: Integer
+test11_1 = assert (encodeModified "aaaabccaadeeee" == [Multiple 4 'a', Single 'b', Multiple 2 'c', Multiple 2 'a',Single 'd', Multiple 4 'e']) 0
