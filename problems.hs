@@ -93,7 +93,7 @@ packHelper x acc = case x of
     x1 : x2 : xs -> if x1 /= x2 then (x1 : acc) : packHelper (x2 : xs) [] else packHelper (x2 : xs) (x1 : acc)
 pack x = packHelper x []
 
-test9_1 :: Integer 
+test9_1 :: Integer
 test9_1 = assert (pack "aaaabccaadeeee" == ["aaaa", "b", "cc", "aa", "d", "eeee"]) 0
 
 -- Problem 10
@@ -124,6 +124,76 @@ decodeModified x = case x of
     (Multiple n a : b) -> [a | i <- [1..n]] ++ decodeModified b
 
 test12_1 :: Integer
-test12_1 = assert (decodeModified 
+test12_1 = assert (decodeModified
        [Multiple 4 'a', Single 'b', Multiple 2 'c',
         Multiple 2 'a', Single 'd', Multiple 4 'e'] == "aaaabccaadeeee") 0
+
+-- Problem 13
+encodeElement :: Int -> a -> Repeat a
+encodeElement 1 y = Single y
+encodeElement n y = Multiple n y
+
+encodeDirect :: (Eq a) => [a] -> [Repeat a]
+encodeDirect [] = []
+encodeDirect (x:xs) = encodeDirectHelper 1 x xs
+encodeDirectHelper :: Eq a => Int -> a -> [a] -> [Repeat a]
+encodeDirectHelper n y [] = [encodeElement n y]
+encodeDirectHelper n y (x:xs) | y == x    = encodeDirectHelper (n+1) y xs
+                         | otherwise = encodeElement n y : encodeDirectHelper 1 x xs
+
+test13_1 :: Integer
+test13_1 = assert (encodeDirect "aaaabccaadeeee" == [Multiple 4 'a', Single 'b', Multiple 2 'c', Multiple 2 'a',Single 'd', Multiple 4 'e']) 0
+
+
+-- Problem 14
+dupli :: Foldable t => t b -> [b]
+dupli = concatMap (\x -> [x, x])
+
+test14_1 :: Integer
+test14_1 = assert (dupli [1, 2, 3] == [1, 1, 2, 2, 3, 3]) 0
+
+-- Problem 15
+repli :: Foldable t => t b -> Int -> [b]
+repli l n = concatMap (\x -> [x | i <- [1..n]]) l
+
+test15_1 :: Integer
+test15_1 = assert (repli [1, 2, 3] 3 == [1, 1, 1, 2, 2, 2, 3, 3, 3]) 0
+
+-- Problem 16
+dropEvery :: [a] -> Int -> [a]
+dropEvery l n = map snd $ filter (\(i, _) -> mod i n /= 0) $ zip [1..length l] l
+
+test16_1 :: Int
+test16_1 = assert (dropEvery [1, 2, 3, 4, 5] 3 == [1, 2, 4, 5]) 0
+
+-- Problem 17
+split :: [a] -> Int -> ([a], [a])
+splitHelper :: (Ord t, Num t) => [a] -> t -> [a] -> ([a], [a])
+splitHelper l n acc | n <= 0 = (acc, l)
+    | otherwise = let x:xs = l in
+        splitHelper xs (n - 1) (x:acc)
+split l n = let (l1, l2) = splitHelper l n [] in (reverse l1, l2)
+
+test17_1 :: Int
+test17_1 = assert (split [1, 2, 3, 4] 1 == ([1], [2, 3, 4])) 0
+
+test17_2 :: Int
+test17_2 = assert (split [1, 2, 3, 4] 3 == ([1, 2, 3], [4])) 0
+
+-- Problem 18
+slice :: [a] -> Int -> Int -> [a]
+slice l a b = let (x, y) = split l (a-1) in
+    let (x', y') = split y (b - a + 1) in x'
+
+test18_1 :: Int
+test18_1 = assert (slice ['a','b','c','d','e','f','g','h','i','k'] 3 7 == "cdefg") 0
+
+-- Problem 19
+rotate :: [a] -> Int -> [a]
+rotate xs n = let l = n `mod` length xs in drop l xs ++ take l xs
+
+test19_1 :: Int
+test19_1 = assert (rotate ['a','b','c','d','e','f','g','h'] 3 == "defghabc") 0
+
+test19_2 :: Int
+test19_2 = assert (rotate ['a','b','c','d','e','f','g','h'] (-2) == "ghabcdef") 0
