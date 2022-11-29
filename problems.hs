@@ -46,6 +46,62 @@ test4_1 = assert (myLength [1, 2, 3, 4, 5] == 5) 5
 myReverse :: [a] -> [a]
 myReverse = foldl (flip (:)) []
 
+test5_1 :: Integer
 test5_1 = assert (myReverse [1, 2, 3, 4, 5] == [5, 4, 3, 2, 1]) 0
 
 -- Problem 6
+isPalindrome :: Eq a => [a] -> Bool
+isPalindrome list = list == reverse list
+
+test6_1 :: Integer
+test6_1 = assert (isPalindrome [1, 2, 3, 4, 5, 4, 3, 2, 1]) 0
+test6_2 :: Integer
+test6_2 = assert (not $ isPalindrome [1, 2, 3, 4, 5]) 0
+
+-- Problem 7
+data NestedList a = Elem a | List [NestedList a]
+--flatten :: NestedList a -> [a]
+flatten :: NestedList a -> [a]
+flatten x = case x of
+    List [] -> []
+    Elem y -> [y]
+    List (Elem a : xs) -> a : flatten (List xs)
+    List (x : xs) -> flatten x ++ flatten (List xs)
+
+test7_1 :: Integer
+test7_1 = assert (null $ flatten (List [])) 0
+test7_2 :: Integer
+test7_2 = assert (flatten (List [Elem 1, List [Elem 2, List [Elem 3, Elem 4], Elem 5]]) == [1, 2, 3, 4, 5]) 0
+
+-- Problem 8
+compress :: Eq a => [a] -> [a]
+compress x = case x of
+    [] -> []
+    [x] -> [x]
+    x1 : x2 : xs -> if x1 /= x2 then x1 : compress (x2 : xs) else compress (x2 : xs)
+
+test8_1 :: Integer
+test8_1 = assert (compress "aaaabccaadeeee" == "abcade") 0
+
+-- Problem 9
+pack :: Eq a => [a] -> [[a]]
+packHelper :: Eq a => [a] -> [a] -> [[a]]
+packHelper x acc = case x of
+    [] -> [[]]
+    [x] -> [x : acc]
+    x1 : x2 : xs -> if x1 /= x2 then (x1 : acc) : packHelper (x2 : xs) [] else packHelper (x2 : xs) (x1 : acc)
+pack x = packHelper x []
+
+test9_1 :: Integer 
+test9_1 = assert (pack "aaaabccaadeeee" == ["aaaa", "b", "cc", "aa", "d", "eeee"]) 0
+
+-- Problem 10
+encodeHelper :: Eq a => [[a]] -> [(Int, a)]
+encodeHelper x = case x of
+    [] -> []
+    (x : y) : xs -> (length (x : y), x) : encodeHelper xs
+encode :: Eq a => [a] -> [(Int, a)]
+encode = encodeHelper . pack
+
+test10_1 :: Integer
+test10_1 = assert (encode "aaaabccaadeeee" == [(4,'a'),(1,'b'),(2,'c'),(2,'a'),(1,'d'),(4,'e')]) 0
