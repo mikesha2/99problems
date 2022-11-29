@@ -41,3 +41,11 @@ myLength = foldr ((+) . const 1) 0
 
 test4_1 :: Integer
 test4_1 = assert (myLength [1, 2, 3, 4, 5] == 5) 5
+
+-- Problem 5
+myReverse :: [a] -> [a]
+myReverse = foldl (flip (:)) []
+
+test5_1 = assert (myReverse [1, 2, 3, 4, 5] == [5, 4, 3, 2, 1]) 0
+
+-- Problem 6
