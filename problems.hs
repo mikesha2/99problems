@@ -197,3 +197,11 @@ test19_1 = assert (rotate ['a','b','c','d','e','f','g','h'] 3 == "defghabc") 0
 
 test19_2 :: Int
 test19_2 = assert (rotate ['a','b','c','d','e','f','g','h'] (-2) == "ghabcdef") 0
+
+-- Problem 20
+removeAt :: Int -> [a] -> (a, [a])
+removeAt n xs = (xs !! (n - 1), take (n - 1) xs ++ drop n xs)
+
+test b = assert b 0
+test20_1 :: Integer
+test20_1 = test (removeAt 2 "abcd" == ('b', "acd"))
